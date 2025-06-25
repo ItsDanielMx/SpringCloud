@@ -1,8 +1,9 @@
 package org.example.springcloud.controller;
 
 
+import com.google.cloud.Timestamp;
+import lombok.RequiredArgsConstructor;
 import org.example.springcloud.dtos.UserDTO;
-import org.example.springcloud.mapper.UsuarioMapper;
 import org.example.springcloud.model.User;
 import org.example.springcloud.repository.UserRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,11 +17,9 @@ import reactor.core.publisher.Mono;
 public class GreetingController {
 
     private final UserRepository userRepository;
-    private final UsuarioMapper userMapper;
 
-    public GreetingController(UserRepository userRepository, UsuarioMapper userMapper) {
+    public GreetingController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
     }
 
     @GetMapping("/greetings")
@@ -34,10 +33,17 @@ public class GreetingController {
     }
 
     @PostMapping("/user")
-    public Mono<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        User user = userMapper.userDTOToUser(userDTO);
+    public Mono<User> createUser(@RequestBody UserDTO userDTO) {
+        return Mono.just(userDTO)
+                .map(user -> User.builder()
+                        .username(user.username())
+                        .firstName(user.firstName())
+                        .lastName(user.lastName())
+                        .age(user.age())
+                        .email(user.email())
+                        .createdAt(Timestamp.now())
+                        .build())
+                .flatMap(userRepository::save);
 
-        return userRepository.save(user)
-                .map(userMapper::userToUserDTO);
     }
 }
