@@ -15,5 +15,11 @@ RUN mkdir /app
 # Copy the jar to the production image from the builder stage.
 COPY --from=build /home/maven/src/target/*.jar /app/app.jar
 
+# Exponer el puerto
+EXPOSE 8080
+
+# Variables de entorno para Cloud Run
+ENV PORT=8080
+
 # Run the web service on container startup.
 ENTRYPOINT ["java","-jar","/app/app.jar"]
