@@ -1,5 +1,4 @@
-# Use the official maven/Java 17 image to create a build artifact.
-FROM maven:3.9-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 # Copy local code to the container image.
 COPY . /home/maven/src
@@ -9,7 +8,7 @@ WORKDIR /home/maven/src
 RUN mvn clean package -DskipTests
 
 # Use multi-stage build with a slim JRE image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 
 RUN mkdir /app
 
